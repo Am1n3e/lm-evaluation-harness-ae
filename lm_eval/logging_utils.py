@@ -409,7 +409,7 @@ class WandbLogger:
             self.run.log({f"{group}_eval_results": grouped_df})
 
 
-def get_commit_from_path(repo_path: Union[Path, str]) -> Optional[str]:
+def get_commit_from_path(repo_path: Path) -> Optional[str]:
     try:
         git_folder = Path(repo_path, ".git")
         if git_folder.is_file():
@@ -428,12 +428,9 @@ def get_commit_from_path(repo_path: Union[Path, str]) -> Optional[str]:
             git_hash = head_ref.read_text(encoding="utf-8").replace("\n", "")
         else:
             git_hash = None
-    except Exception as err:
-        logger.debug(
-            f"Failed to retrieve a Git commit hash from path: {str(repo_path)}. Error: {err}"
-        )
+        return git_hash
+    except Exception:
         return None
-    return git_hash
 
 
 def get_git_commit_hash():
@@ -445,11 +442,8 @@ def get_git_commit_hash():
         git_hash = subprocess.check_output(["git", "describe", "--always"]).strip()
         git_hash = git_hash.decode()
     except (subprocess.CalledProcessError, FileNotFoundError):
-        try:
-            # FileNotFoundError occurs when git not installed on system
-            git_hash = get_commit_from_path(os.getcwd())  # git hash of repo if exists
-        except Exception:
-            git_hash = "N/A"  # Called from a direct install
+        # FileNotFoundError occurs when git not installed on system
+        git_hash = get_commit_from_path(os.getcwd())  # git hash of repo if exists
     return git_hash
 
 
