@@ -8,6 +8,7 @@ from functools import partial
 from pathlib import Path
 from typing import Union
 
+import datasets
 import numpy as np
 
 from lm_eval import evaluator, utils
@@ -16,6 +17,10 @@ from lm_eval.logging_utils import WandbLogger
 from lm_eval.tasks import TaskManager
 from lm_eval.utils import make_table, simple_parse_args_string
 
+
+# Hack to disable disk space check on toolkit
+# More details: https://github.com/huggingface/datasets/issues/1785
+datasets.builder.has_sufficient_disk_space = lambda needed_bytes, directory=".": True
 
 DEFAULT_RESULTS_FILE = "results.json"
 
