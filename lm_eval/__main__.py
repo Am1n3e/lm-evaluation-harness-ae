@@ -7,6 +7,7 @@ import sys
 from functools import partial
 from pathlib import Path
 from typing import Union
+from unittest.mock import patch
 
 import datasets
 import numpy as np
@@ -250,6 +251,13 @@ def cli_evaluate(args: Union[argparse.Namespace, None] = None) -> None:
 
     if args.wandb_args:
         wandb_logger = WandbLogger(**simple_parse_args_string(args.wandb_args))
+        wandb_step = os.environ.get("WANDB_FORCE_STEP", None)
+        if wandb_step:
+            print(f"Setting WANDB_FORCE_STEP to {wandb_step}")
+            def _log(data):
+                wandb_logger.run.log(data, step=int(wandb_step))
+            wandb_logger.run.log = _log
+
 
     eval_logger = utils.eval_logger
     eval_logger.setLevel(getattr(logging, f"{args.verbosity}"))
