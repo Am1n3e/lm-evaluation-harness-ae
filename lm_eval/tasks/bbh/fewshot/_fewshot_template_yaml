@@ -20,3 +20,8 @@ num_fewshot: 0
 metadata:
   version: 1.0
   num_fewshot: 3 # will be printed in results table
+filter_list:
+  - name: remove_whitespace
+    filter:
+      - function: remove_whitespace
+      - function: take_first

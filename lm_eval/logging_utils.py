@@ -238,7 +238,12 @@ class WandbLogger:
         # update wandb.run.summary with items that were removed
         self.run.summary.update(wandb_summary)
         # Log the evaluation metrics to wandb
-        self.run.log(self.wandb_results)
+
+        step = os.environ.get("WANDB_FORCE_STEP", None)
+        if step:
+            print(f"Setting WANDB_FORCE_STEP to {step}")
+            step=int(step)
+        self.run.log(self.wandb_results, step=step)
         # Log the evaluation metrics as W&B Table
         self._log_results_as_table()
         # Log the results dict as json to W&B Artifacts
